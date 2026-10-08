@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lê Nhật Long | Portfolio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Space Grotesk & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        cyber: {
+                            black: '#070709',
+                            dark: '#0f0f14',
+                            card: '#16161f',
+                            border: '#262633',
+                            light: '#e2e8f0',
+                            accent: '#ffffff'
+                        }
+                    },
+                    animation: {
+                        'float': 'float 4s ease-in-out infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                        'pulse-glow': 'pulseGlow 2.5s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-12px)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.4', filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.3))' },
+                            '50%': { opacity: '0.9', filter: 'drop-shadow(0 0 35px rgba(255,255,255,0.7))' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #070709;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* Particles Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Subtle Grid Pattern Background Overlay */
+        .bg-grid {
+            background-size: 45px 45px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+        }
+
+        /* Glassmorphism Styling */
+        .glass-card {
+            background: rgba(22, 22, 31, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 35px rgba(255, 255, 255, 0.08);
+            transform: translateY(-3px);
+        }
+
+        /* Cyber Ring Particle Aura Effect */
+        .cyber-ring {
+            position: absolute;
+            inset: -12px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.35);
+            animation: spin 16s linear infinite;
+        }
+
+        .cyber-ring-outer {
+            position: absolute;
+            inset: -22px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        /* Toast Popup Styling */
+        #toast {
+            transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform: translateY(100px);
+            opacity: 0;
+        }
+
+        #toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Entrance Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fade-in-up.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Anime Monochrome B&W Filter */
+        .anime-avatar {
+            filter: grayscale(100%) contrast(115%) brightness(95%);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .avatar-container:hover .anime-avatar {
+            filter: grayscale(70%) contrast(125%) brightness(105%);
+            transform: scale(1.04);
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070709;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262633;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #444455;
+        }
+    </style>
+</head>
+<body class="font-sans bg-grid antialiased selection:bg-white selection:text-black relative">
+
+    <!-- Interactive Background Particle Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Notification Toast Popup -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-white text-black px-5 py-3 rounded-xl shadow-2xl font-medium border border-gray-200">
+        <i class="fa-solid fa-circle-check text-black text-lg"></i>
+        <span id="toast-message">Đã sao chép vào bộ nhớ tạm!</span>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-40 px-6 py-4 transition-all duration-300" id="navbar">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <!-- Strict requirement: Brand name displays LÊ NHẬT LONG (No "Long Dev") -->
+            <a href="#hero" class="font-heading font-bold text-lg sm:text-xl tracking-wider text-white flex items-center gap-2">
+                <span class="inline-block w-2.5 h-2.5 bg-white rounded-full animate-ping"></span>
+                <span>LÊ NHẬT LONG</span>
+            </a>
+            <nav class="flex items-center gap-6 text-sm font-medium">
+                <a href="#hero" class="text-gray-400 hover:text-white transition-colors">Trang chủ</a>
+                <a href="#contact" class="text-gray-400 hover:text-white transition-colors">Liên hệ</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- PAGE 1: HERO SECTION -->
+    <section id="hero" class="min-h-screen relative flex flex-col justify-center items-center px-6 pt-24 pb-12 overflow-hidden z-10">
+        
+        <!-- Ambient Glowing Core Effect -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[450px] sm:h-[450px] bg-white/5 rounded-full blur-[110px] pointer-events-none animate-pulse-glow"></div>
+
+        <div class="max-w-4xl mx-auto text-center flex flex-col items-center z-10">
+            
+            <!-- Anime Profile Avatar Container with Glowing Aura Ring -->
+            <div class="avatar-container relative mb-10 fade-in-up group cursor-pointer" style="transition-delay: 100ms;">
+                
+                <!-- Rotating Outer Dashed Cyber Ring -->
+                <div class="cyber-ring"></div>
+                <!-- Outer Glowing Floating Halo Ring -->
+                <div class="cyber-ring-outer"></div>
+                
+                <!-- Ambient Backdrop Glow -->
+                <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-gray-400 via-white to-gray-500 opacity-40 group-hover:opacity-80 blur-md transition duration-500"></div>
+                
+                <!-- Avatar Frame Box -->
+                <div class="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full overflow-hidden border-2 border-white/40 p-1 bg-cyber-dark shadow-2xl">
+                    <!-- Anime Monochrome Male Profile Image -->
+                    <img 
+                        src="https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=600&auto=format&fit=crop" 
+                        alt="Lê Nhật Long Profile Avatar" 
+                        class="anime-avatar w-full h-full object-cover rounded-full"
+                        onerror="this.onerror=null; this.src='https://placehold.co/400x400/16161f/ffffff?text=L%C3%AA+Nh%E1%BA%ADt+Long';"
+                    />
+                </div>
+
+                <!-- Live Status Badge -->
+                <div class="absolute bottom-2 right-2 bg-cyber-black border border-white/20 px-3.5 py-1 rounded-full flex items-center gap-2 text-xs font-mono text-gray-300 shadow-xl backdrop-blur-md">
+                    <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                    <span class="tracking-wider">ONLINE</span>
+                </div>
+            </div>
+
+            <!-- Main Title & Name -->
+            <div class="fade-in-up" style="transition-delay: 250ms;">
+                <p class="text-xs sm:text-sm font-mono tracking-[0.35em] text-gray-400 uppercase mb-3">Welcome to Portfolio</p>
+                <!-- Title is strictly "LÊ NHẬT LONG" -->
+                <h1 class="font-heading font-bold text-4xl sm:text-6xl md:text-7xl text-white tracking-tight mb-4 drop-shadow-md">
+                    LÊ NHẬT LONG
+                </h1>
+            </div>
+
+            <!-- Typing Text Subtitle -->
+            <div class="fade-in-up h-8 sm:h-10 mb-6" style="transition-delay: 400ms;">
+                <p class="font-mono text-gray-400 text-sm sm:text-base md:text-lg">
+                    <span class="text-gray-500">&gt; </span>
+                    <span id="typing-text" class="text-white font-semibold"></span>
+                    <span class="animate-pulse text-white">_</span>
+                </p>
+            </div>
+
+            <!-- Concise Intro Bio -->
+            <p class="fade-in-up max-w-lg text-gray-400 text-sm sm:text-base leading-relaxed mb-12" style="transition-delay: 550ms;">
+                Khám phá thế giới số với tư duy tối giản, phong cách Cyber Monochrome độc đáo và nhiệt huyết sáng tạo không giới hạn.
+            </p>
+
+            <!-- Scroll Down Indicator -->
+            <div class="fade-in-up" style="transition-delay: 700ms;">
+                <a href="#contact" class="group inline-flex flex-col items-center gap-3 text-gray-400 hover:text-white transition-colors duration-300">
+                    <span class="text-xs font-mono tracking-widest uppercase group-hover:translate-y-1 transition-transform">Trang tiếp theo</span>
+                    <div class="w-8 h-12 rounded-full border-2 border-white/20 flex justify-center p-2 group-hover:border-white transition-colors shadow-lg">
+                        <div class="w-1 h-3 bg-white rounded-full animate-bounce"></div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PAGE 2: CONTACT SECTION (LƯỚT XUỐNG) -->
+    <section id="contact" class="min-h-screen flex flex-col justify-center items-center px-6 py-24 relative z-10 border-t border-white/5 bg-cyber-dark/40">
+        
+        <div class="max-w-4xl w-full mx-auto">
+            
+            <!-- Section Header -->
+            <div class="text-center mb-16 fade-in-up">
+                <span class="text-xs font-mono tracking-[0.25em] text-gray-400 uppercase">KÊNH KẾT NỐI CHÍNH THỨC</span>
+                <h2 class="font-heading font-bold text-3xl sm:text-5xl text-white mt-2">THÔNG TIN LIÊN HỆ</h2>
+                <div class="w-16 h-1 bg-white mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <!-- Contact Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                
+                <!-- Zalo Contact Card -->
+                <div class="glass-card rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 fade-in-up group" style="transition-delay: 150ms;">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-white mb-5 group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-md">
+                            <i class="fa-solid fa-comment-dots"></i>
+                        </div>
+                        <h3 class="font-heading font-semibold text-xl text-white mb-1">Zalo</h3>
+                        <p class="text-xs text-gray-400 mb-4">Chat trực tiếp qua Zalo</p>
+                        <p class="font-mono text-sm text-gray-200 bg-cyber-black/70 p-3 rounded-lg border border-white/10 mb-6 select-all font-medium">
+                            0862878500
+                        </p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="copyToClipboard('0862878500', 'Đã sao chép số Zalo: 0862878500')" class="flex-1 py-2.5 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Sao chép</span>
+                        </button>
+                        <a href="https://zalo.me/0862878500" target="_blank" rel="noopener noreferrer" class="py-2.5 px-4 rounded-lg bg-white text-black hover:bg-gray-200 text-xs font-semibold transition-colors flex items-center justify-center" title="Mở Zalo">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Facebook Contact Card -->
+                <div class="glass-card rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 fade-in-up group" style="transition-delay: 300ms;">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-white mb-5 group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-md">
+                            <i class="fa-brands fa-facebook-f"></i>
+                        </div>
+                        <h3 class="font-heading font-semibold text-xl text-white mb-1">Facebook</h3>
+                        <p class="text-xs text-gray-400 mb-4">Trang cá nhân chính thức</p>
+                        <p class="font-mono text-sm text-gray-200 bg-cyber-black/70 p-3 rounded-lg border border-white/10 mb-6 truncate font-medium">
+                            lenhatlong200213
+                        </p>
+                    </div>
+                    <a href="https://www.facebook.com/lenhatlong200213" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 rounded-lg bg-white text-black hover:bg-gray-200 text-xs font-semibold transition-colors flex items-center justify-center gap-2">
+                        <span>Ghé thăm Trang</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </a>
+                </div>
+
+                <!-- Gmail Contact Card -->
+                <div class="glass-card rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 fade-in-up group" style="transition-delay: 450ms;">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-white mb-5 group-hover:bg-white group-hover:text-black transition-all duration-300 shadow-md">
+                            <i class="fa-regular fa-envelope"></i>
+                        </div>
+                        <h3 class="font-heading font-semibold text-xl text-white mb-1">Gmail</h3>
+                        <p class="text-xs text-gray-400 mb-4">Gửi Email công việc</p>
+                        <p class="font-mono text-xs text-gray-200 bg-cyber-black/70 p-3 rounded-lg border border-white/10 mb-6 truncate select-all font-medium" title="lenhatlong20.contact@gmail.com">
+                            lenhatlong20.contact@gmail.com
+                        </p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="copyToClipboard('lenhatlong20.contact@gmail.com', 'Đã sao chép địa chỉ Gmail!')" class="flex-1 py-2.5 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium transition-colors flex items-center justify-center gap-2">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Sao chép</span>
+                        </button>
+                        <a href="mailto:lenhatlong20.contact@gmail.com" class="py-2.5 px-4 rounded-lg bg-white text-black hover:bg-gray-200 text-xs font-semibold transition-colors flex items-center justify-center" title="Gửi Email ngay">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Quick Bio Callout Card -->
+            <div class="glass-card rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 fade-in-up" style="transition-delay: 600ms;">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white shrink-0">
+                        <i class="fa-solid fa-bolt text-lg"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-heading font-semibold text-white text-base sm:text-lg">Sẵn sàng phản hồi 24/7</h4>
+                        <p class="text-xs sm:text-sm text-gray-400">Hãy liên hệ với tôi qua bất kỳ kênh nào ở trên để trao đổi công việc.</p>
+                    </div>
+                </div>
+                <a href="mailto:lenhatlong20.contact@gmail.com" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-white text-black text-xs font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors text-center shrink-0">
+                    Gửi tin nhắn ngay
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 text-center text-xs text-gray-500 border-t border-white/5 relative z-10">
+        <p>© <span id="current-year"></span> Lê Nhật Long. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Set dynamic current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        /* ----------------------------------------------------
+           1. Interactive Particle Canvas Background
+           ---------------------------------------------------- */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particlesArray = [];
+        const numberOfParticles = 65;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.opacity = Math.random() * 0.6 + 0.2;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                else if (this.x < 0) this.x = canvas.width;
+
+                if (this.y > canvas.height) this.y = 0;
+                else if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particlesArray = [];
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+
+                // Connect nearby particles with subtle white lines
+                for (let j = i + 1; j < particlesArray.length; j++) {
+                    const dx = particlesArray[i].x - particlesArray[j].x;
+                    const dy = particlesArray[i].y - particlesArray[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 110) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(255, 255, 255, ${0.12 - distance / 1100})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        /* ----------------------------------------------------
+           2. Typing Text Animation Effect
+           ---------------------------------------------------- */
+        const typingPhrases = [
+            "Developer & Creative Mind",
+            "Monochrome Cyber Aesthetic",
+            "Manga & Anime Fan",
+            "Chào mừng đến với trang của tôi!"
+        ];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typingElement = document.getElementById('typing-text');
+
+        function typeEffect() {
+            const currentPhrase = typingPhrases[phraseIndex];
+            
+            if (isDeleting) {
+                typingElement.textContent = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typingElement.textContent = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 35 : 75;
+
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                typeSpeed = 2200; // Pause at end
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % typingPhrases.length;
+                typeSpeed = 400; // Pause before typing next phrase
+            }
+
+            setTimeout(typeEffect, typeSpeed);
+        }
+
+        // Start typing on DOM ready
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(typeEffect, 600);
+            initScrollObserver();
+        });
+
+        /* ----------------------------------------------------
+           3. Scroll Reveal Animation (Intersection Observer)
+           ---------------------------------------------------- */
+        function initScrollObserver() {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.12
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            const animElements = document.querySelectorAll('.fade-in-up');
+            animElements.forEach(el => observer.observe(el));
+        }
+
+        /* ----------------------------------------------------
+           4. Navbar scroll backdrop adaptation
+           ---------------------------------------------------- */
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-cyber-black/85', 'backdrop-blur-md', 'border-b', 'border-white/10', 'py-3');
+                navbar.classList.remove('py-4');
+            } else {
+                navbar.classList.remove('bg-cyber-black/85', 'backdrop-blur-md', 'border-b', 'border-white/10');
+                navbar.classList.add('py-4');
+            }
+        });
+
+        /* ----------------------------------------------------
+           5. Clipboard Copy Logic & Toast System
+           ---------------------------------------------------- */
+        function copyToClipboard(text, successMessage) {
+            // Textarea fallback for iframe clipboard support
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(successMessage || 'Đã sao chép vào bộ nhớ tạm!');
+            } catch (err) {
+                showToast('Không thể sao chép, vui lòng thử lại.');
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        let toastTimeout;
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = msg;
+            toast.classList.add('show');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
